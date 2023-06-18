@@ -9,11 +9,17 @@ E = torch.tensor(1., requires_grad=True)
 C = A * B
 D = C.exp()
 F = D + E
+
 print(F)        # tensor(3.7183, grad_fn=<AddBackward0>) 打印计算结果，可以看到F的grad_fn指向AddBackward，即产生F的运算
+
 print([x.is_leaf for x in [A, B, C, D, E, F]])  # [True, True, False, False, True, False] 打印是否为叶节点，由用户创建，且requires_grad设为True的节点为叶节点
+
 print([x.grad_fn for x in [F, D, C, A]])    # [<AddBackward0 object at 0x7f972de8c7b8>, <ExpBackward object at 0x7f972de8c278>, <MulBackward0 object at 0x7f972de8c2b0>, None]  每个变量的grad_fn指向产生其算子的backward function，叶节点的grad_fn为空
+
 print(F.grad_fn.next_functions) # ((<ExpBackward object at 0x7f972de8c390>, 0), (<AccumulateGrad object at 0x7f972de8c5f8>, 0)) 由于F = D + E， 因此F.grad_fn.next_functions也存在两项，分别对应于D, E两个变量，每个元组中的第一项对应于相应变量的grad_fn，第二项指示相应变量是产生其op的第几个输出。E作为叶节点，其上没有grad_fn，但有梯度累积函数，即AccumulateGrad（由于反传时多出可能产生梯度，需要进行累加）
+
 F.backward(retain_graph=True)   # 进行梯度反传
 print(A.grad, B.grad, E.grad)   # tensor(1.3591) tensor(5.4366) tensor(1.) 算得每个变量梯度，与求导得到的相符
+
 print(C.grad, D.grad)   # None None 为节约空间，梯度反传完成后，中间节点的梯度并不会保留
 
