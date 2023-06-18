@@ -13,16 +13,19 @@ print(output_linear)
 print(torch.eq(output_linear, output_mm))
 
 
-# this 
+# torch.nn.Linear, torch.matmul
 linear = torch.nn.Linear(3, 3)
 inputs = torch.rand(3, 3)
 
 output_linear = linear(inputs)
 print(output_linear)
-output_mm = torch.mm(inputs, linear.weight.T).add(linear.bias)
+output_mm = torch.matmul(inputs, linear.weight.T).add(linear.bias)
 print(output_mm)
 print(linear.weight.T)
 print(linear.bias)
 
 print(torch.eq(output_linear, output_mm))
 
+
+# https://www.zhihu.com/question/66782101
+# toch.
